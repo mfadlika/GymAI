@@ -10,24 +10,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import ChatScreen from "./screens/ChatScreen";
+import HistoryScreen from "./screens/HistoryScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
-
-function HistoryScreen() {
-  return (
-    <View style={screenStyles.container}>
-      <Text>Riwayat</Text>
-    </View>
-  );
-}
-function ProfileScreen() {
-  return (
-    <View style={screenStyles.container}>
-      <Text>Profil</Text>
-    </View>
-  );
-}
 
 function CustomTabBar({ state, descriptors, navigation }) {
   return (
