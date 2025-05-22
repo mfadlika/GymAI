@@ -9,17 +9,11 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import ChatScreen from "./screens/ChatScreen";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
 
-function ChatScreen() {
-  return (
-    <View style={screenStyles.container}>
-      <Text>Chat</Text>
-    </View>
-  );
-}
 function HistoryScreen() {
   return (
     <View style={screenStyles.container}>
