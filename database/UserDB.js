@@ -1,6 +1,6 @@
-import SQLite from 'expo-sqlite';
+import * as SQLite from "expo-sqlite";
 
-const dbPromise = SQLite.openDatabaseAsync('gymAI.db');
+const dbPromise = SQLite.openDatabaseAsync("gymAI.db");
 
 export const getDBConnection = async () => {
   return await dbPromise;
