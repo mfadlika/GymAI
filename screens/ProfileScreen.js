@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,54 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Button,
+  Alert,
 } from "react-native";
 import photo from "../assets/yudha.jpeg";
+import { createTable, saveUserData, getLatestUserData } from "../database/UserDB";
 
 export default function ProfileScreen() {
-  const [name, setName] = useState("Yudha Rizky Abdullah");
-  const [weight, setWeight] = useState("65");
-  const [height, setHeight] = useState("175");
+  const [name, setName] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await createTable();
+        await loadUserData();
+      } catch (err) {
+        console.error("DB Error:", err);
+      }
+    })();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const user = await getLatestUserData();
+      if (user && typeof user === "object") {
+        setName(user.name?.toString() ?? "");
+        setWeight(user.weight?.toString() ?? "");
+        setHeight(user.height?.toString() ?? "");
+      }
+    } catch (err) {
+      console.error("Gagal memuat data pengguna:", err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!name || !weight || !height) {
+      Alert.alert("Error", "Semua field harus diisi.");
+      return;
+    }
+    try {
+      await saveUserData(name, weight, height);
+      Alert.alert("Berhasil", "Data berhasil disimpan.");
+    } catch (err) {
+      console.error("Gagal menyimpan data:", err);
+      Alert.alert("Error", "Gagal menyimpan data.");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -22,10 +63,7 @@ export default function ProfileScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.card}>
           <Image source={photo} style={styles.avatar} />
 
@@ -63,6 +101,8 @@ export default function ProfileScreen() {
               placeholderTextColor="#999"
             />
           </View>
+
+          <Button title="Simpan Data" onPress={handleSave} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
