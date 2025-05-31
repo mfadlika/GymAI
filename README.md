@@ -41,6 +41,7 @@ npx expo start
 
 ## Project Structure
 
+```
 MobileApp/
 ├── api/               # API call to Gemini
 ├── assets/            # Images, fonts, etc
@@ -54,6 +55,7 @@ MobileApp/
 ├── index.js           # Index file
 ├── package.json
 └── README.md
+```
 
 ## 👨‍💻 Author
 
