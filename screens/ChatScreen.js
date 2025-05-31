@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { callGeminiAPI } from "../api/api";
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([]);
@@ -20,20 +21,28 @@ export default function ChatScreen() {
   const scrollViewRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = React.useState(true); // flag apakah scroll di bawah
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "") return;
 
-    setMessages([...messages, { text: input, sender: "user" }]);
+    const userMessage = { text: input, sender: "user" };
+    setMessages((prev) => [...prev, userMessage]);
+    const prompt = input;
     setInput("");
-    setTimeout(() => {
+
+    try {
+      const geminiResponse = await callGeminiAPI(prompt);
+
+      const botReply =
+        geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text ??
+        "Maaf, saya tidak dapat memberikan jawaban.";
+
+      setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
-        {
-          text: "Halo, saya adalah GymAI dan ini adalah respon otomatis. Kamu belum terkoneksi ke server.",
-          sender: "bot",
-        },
+        { text: "Terjadi kesalahan saat menghubungi server.", sender: "bot" },
       ]);
-    }, 500);
+    }
   };
 
   const handleScroll = (event) => {
