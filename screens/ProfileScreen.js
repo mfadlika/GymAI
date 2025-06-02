@@ -10,20 +10,49 @@ import {
   ScrollView,
   Button,
   Alert,
+  Switch,
 } from "react-native";
 import photo from "../assets/yudha.jpeg";
-import { createTable, saveUserData, getLatestUserData } from "../database/UserDB";
+import {
+  createTable,
+  saveUserData,
+  getLatestUserData,
+  getLatestUserDaysPreference,
+  updateUserDaysPreference,
+} from "../database/UserDB";
 
 export default function ProfileScreen() {
   const [name, setName] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
+  const [days, setDays] = useState({
+    senin: true,
+    selasa: true,
+    rabu: true,
+    kamis: true,
+    jumat: true,
+    sabtu: false,
+    minggu: false,
+  });
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
         await createTable();
         await loadUserData();
+        const user = await getLatestUserData();
+        if (user) setUserId(user.id);
+        const pref = await getLatestUserDaysPreference();
+        setDays({
+          senin: !!pref.senin,
+          selasa: !!pref.selasa,
+          rabu: !!pref.rabu,
+          kamis: !!pref.kamis,
+          jumat: !!pref.jumat,
+          sabtu: !!pref.sabtu,
+          minggu: !!pref.minggu,
+        });
       } catch (err) {
         console.error("DB Error:", err);
       }
@@ -57,13 +86,22 @@ export default function ProfileScreen() {
     }
   };
 
+  const toggleDay = async (day) => {
+    const newDays = { ...days, [day]: !days[day] };
+    setDays(newDays);
+    if (userId) await updateUserDaysPreference(userId, newDays);
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.card}>
           <Image source={photo} style={styles.avatar} />
 
@@ -101,6 +139,20 @@ export default function ProfileScreen() {
               placeholderTextColor="#999"
             />
           </View>
+
+          <Text
+            style={[styles.label, { marginTop: 16, marginBottom: 8 }]}
+          >
+            Preferensi Hari Latihan
+          </Text>
+          {Object.entries(days).map(([day, value]) => (
+            <View key={day} style={styles.row}>
+              <Text style={styles.label}>
+                {day.charAt(0).toUpperCase() + day.slice(1)}
+              </Text>
+              <Switch value={value} onValueChange={() => toggleDay(day)} />
+            </View>
+          ))}
 
           <Button title="Simpan Data" onPress={handleSave} />
         </View>
@@ -157,5 +209,11 @@ const styles = StyleSheet.create({
     color: "#333",
     borderWidth: 1,
     borderColor: "#ccc",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 6,
   },
 });
