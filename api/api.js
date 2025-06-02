@@ -7,7 +7,6 @@ import { createGymScheduleTable, saveGymScheduleFromCSV } from "../database/User
 const GEMINI_URL = GEMINI_API;
 
 const generateDefaultGymSchedule = (weight, height) => {
-  // Contoh jadwal lebih lengkap
   const schedule = [
     {
       day: "Monday",
@@ -92,6 +91,7 @@ export const callGeminiAPI = async (prompt) => {
     );
 
     if (prompt.toLowerCase().includes("jadwal gym")) {
+
       const csvContent = generateDefaultGymSchedule(
         userData.weight,
         userData.height
