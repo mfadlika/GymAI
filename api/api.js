@@ -91,6 +91,7 @@ export const callGeminiAPI = async (prompt) => {
     );
 
     if (prompt.toLowerCase().includes("jadwal gym")) {
+
       const csvContent = generateDefaultGymSchedule(
         userData.weight,
         userData.height
