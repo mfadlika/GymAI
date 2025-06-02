@@ -8,6 +8,10 @@ export const getDBConnection = async () => {
 
 export const createTable = async () => {
   const db = await getDBConnection();
+  await db.execAsync(`DROP TABLE IF EXISTS user_info;`);
+  await db.execAsync(`DROP TABLE IF EXISTS gym_schedule;`);
+
+  // Recreate tables
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS user_info (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,6 +25,18 @@ export const createTable = async () => {
       jumat INTEGER DEFAULT 1,
       sabtu INTEGER DEFAULT 0,
       minggu INTEGER DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS gym_schedule (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      day TEXT,
+      muscle_group TEXT,
+      exercise TEXT,
+      sets INTEGER,
+      reps INTEGER,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -51,9 +67,11 @@ export const saveUserData = async (name, weight, height) => {
 
 export const saveGymScheduleFromCSV = async (csvContent) => {
   const db = await getDBConnection();
-  const lines = csvContent.trim().split('\n');
+  const lines = csvContent.trim().split("\n");
   for (let i = 1; i < lines.length; i++) {
-    const [day, muscleGroup, exercise, sets, reps] = lines[i].split(',').map(s => s.trim());
+    const [day, muscleGroup, exercise, sets, reps] = lines[i]
+      .split(",")
+      .map((s) => s.trim());
     if (day && muscleGroup && exercise && sets && reps) {
       await db.runAsync(
         `INSERT INTO gym_schedule (day, muscle_group, exercise, sets, reps) VALUES (?, ?, ?, ?, ?);`,
@@ -91,7 +109,7 @@ export const updateUserDaysPreference = async (id, days) => {
       days.jumat ? 1 : 0,
       days.sabtu ? 1 : 0,
       days.minggu ? 1 : 0,
-      id
+      id,
     ]
   );
 };
@@ -102,18 +120,31 @@ export const getLatestUserDaysPreference = async () => {
   const result = await db.getFirstAsync(
     `SELECT senin, selasa, rabu, kamis, jumat, sabtu, minggu FROM user_info ORDER BY created_at DESC LIMIT 1;`
   );
-  return result ?? {
-    senin: 1, selasa: 1, rabu: 1, kamis: 1, jumat: 1, sabtu: 0, minggu: 0
-  };
+  return (
+    result ?? {
+      senin: 1,
+      selasa: 1,
+      rabu: 1,
+      kamis: 1,
+      jumat: 1,
+      sabtu: 0,
+      minggu: 0,
+    }
+  );
 };
 
 import React, { useEffect, useState } from "react";
 import { View, Text, Switch, StyleSheet } from "react-native";
-import { getLatestUserDaysPreference, updateUserDaysPreference, getLatestUserData } from "../database/UserDB";
 
 export default function ProfileScreen() {
   const [days, setDays] = useState({
-    senin: true, selasa: true, rabu: true, kamis: true, jumat: true, sabtu: false, minggu: false
+    senin: true,
+    selasa: true,
+    rabu: true,
+    kamis: true,
+    jumat: true,
+    sabtu: false,
+    minggu: false,
   });
   const [userId, setUserId] = useState(null);
 
@@ -123,8 +154,13 @@ export default function ProfileScreen() {
       if (user) setUserId(user.id);
       const pref = await getLatestUserDaysPreference();
       setDays({
-        senin: !!pref.senin, selasa: !!pref.selasa, rabu: !!pref.rabu,
-        kamis: !!pref.kamis, jumat: !!pref.jumat, sabtu: !!pref.sabtu, minggu: !!pref.minggu
+        senin: !!pref.senin,
+        selasa: !!pref.selasa,
+        rabu: !!pref.rabu,
+        kamis: !!pref.kamis,
+        jumat: !!pref.jumat,
+        sabtu: !!pref.sabtu,
+        minggu: !!pref.minggu,
       });
     })();
   }, []);
@@ -140,7 +176,9 @@ export default function ProfileScreen() {
       <Text style={styles.title}>Preferensi Hari Latihan</Text>
       {Object.entries(days).map(([day, value]) => (
         <View key={day} style={styles.row}>
-          <Text style={styles.label}>{day.charAt(0).toUpperCase() + day.slice(1)}</Text>
+          <Text style={styles.label}>
+            {day.charAt(0).toUpperCase() + day.slice(1)}
+          </Text>
           <Switch value={value} onValueChange={() => toggleDay(day)} />
         </View>
       ))}
@@ -151,6 +189,11 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { padding: 24 },
   title: { fontWeight: "bold", fontSize: 18, marginBottom: 16 },
-  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 8 },
-  label: { fontSize: 16 }
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 8,
+  },
+  label: { fontSize: 16 },
 });
