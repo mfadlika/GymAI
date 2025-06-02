@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView } from "react-native";
-import { getDBConnection } from "../database/UserDB";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView, Alert } from "react-native";
+import { getDBConnection, updateUserDaysPreference, getLatestUserData } from "../database/UserDB";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function HistoryScreen() {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     fetchSchedules();
+    fetchUserId();
   }, []);
 
   const fetchSchedules = async () => {
@@ -23,6 +25,11 @@ export default function HistoryScreen() {
     setSchedules(result);
   };
 
+  const fetchUserId = async () => {
+    const user = await getLatestUserData();
+    if (user) setUserId(user.id);
+  };
+
   const handlePress = (item) => {
     const details = item.details.split(";").map((row) => {
       const [day, muscle_group, exercise, sets, reps] = row.split("|");
@@ -30,6 +37,23 @@ export default function HistoryScreen() {
     });
     setSelectedSchedule({ created_at: item.created_at, details });
     setModalVisible(true);
+  };
+
+  const handleSavePreference = async () => {
+    if (!selectedSchedule || !userId) return;
+    const daysInSchedule = selectedSchedule.details.map(d => d.day.toLowerCase());
+    const hariPref = {
+      senin: daysInSchedule.includes("monday") ? 1 : 0,
+      selasa: daysInSchedule.includes("tuesday") ? 1 : 0,
+      rabu: daysInSchedule.includes("wednesday") ? 1 : 0,
+      kamis: daysInSchedule.includes("thursday") ? 1 : 0,
+      jumat: daysInSchedule.includes("friday") ? 1 : 0,
+      sabtu: daysInSchedule.includes("saturday") ? 1 : 0,
+      minggu: daysInSchedule.includes("sunday") ? 1 : 0,
+    };
+    await updateUserDaysPreference(userId, hariPref);
+    Alert.alert("Berhasil", "Preferensi hari berhasil disimpan ke profil!");
+    setModalVisible(false);
   };
 
   const renderItem = ({ item, index }) => (
@@ -81,6 +105,10 @@ export default function HistoryScreen() {
                 </View>
               ))}
             </ScrollView>
+            <TouchableOpacity style={styles.saveButton} onPress={handleSavePreference}>
+              <Ionicons name="save-outline" size={18} color="#fff" />
+              <Text style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}>Jadikan Preferensi Hari</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
               <Ionicons name="close" size={18} color="#fff" />
               <Text style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}>Tutup</Text>
@@ -199,6 +227,16 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     backgroundColor: "#007aff",
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  saveButton: {
+    marginTop: 6,
+    backgroundColor: "#28b463",
     paddingVertical: 10,
     paddingHorizontal: 24,
     borderRadius: 8,
