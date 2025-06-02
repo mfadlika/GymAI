@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,8 +18,27 @@ import { callGeminiAPI } from "../api/api";
 export default function ChatScreen() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingText, setTypingText] = useState("Bot sedang mengetik");
   const scrollViewRef = useRef(null);
-  const [isAtBottom, setIsAtBottom] = React.useState(true); // flag apakah scroll di bawah
+  const [isAtBottom, setIsAtBottom] = React.useState(true);
+
+  useEffect(() => {
+    let interval;
+    if (isTyping) {
+      let dots = "";
+      interval = setInterval(() => {
+        dots += ".";
+        if (dots.length > 3) {
+          dots = "";
+        }
+        setTypingText(`Bot sedang mengetik${dots}`);
+      }, 500);
+    } else {
+      setTypingText("Bot sedang mengetik");
+    }
+    return () => clearInterval(interval);
+  }, [isTyping]);
 
   const handleSend = async () => {
     if (input.trim() === "") return;
@@ -28,21 +47,72 @@ export default function ChatScreen() {
     setMessages((prev) => [...prev, userMessage]);
     const prompt = input;
     setInput("");
+    setIsTyping(true);
 
     try {
       const geminiResponse = await callGeminiAPI(prompt);
 
-      const botReply =
-        geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text ??
-        "Maaf, saya tidak dapat memberikan jawaban.";
-
-      setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
+      if (
+        typeof geminiResponse === "string" &&
+        geminiResponse.startsWith("PROFILE_UPDATE_REQUIRED:")
+      ) {
+        const updateMessage = geminiResponse.split(":")[1];
+        setMessages((prev) => [
+          ...prev,
+          { text: updateMessage, sender: "bot" },
+        ]);
+      } else if (
+        typeof geminiResponse === "string" &&
+        geminiResponse.startsWith("API_ERROR:")
+      ) {
+        const errorMessage = geminiResponse.split(":")[1];
+        setMessages((prev) => [...prev, { text: errorMessage, sender: "bot" }]);
+      } else {
+        const botReply =
+          geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text ??
+          "Maaf, saya tidak dapat memberikan jawaban.";
+        setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
+      }
     } catch (error) {
+
+      console.error("ChatScreen error:", error);
       setMessages((prev) => [
         ...prev,
-        { text: "Terjadi kesalahan saat menghubungi server.", sender: "bot" },
+        { text: "Terjadi kesalahan yang tidak terduga.", sender: "bot" },
       ]);
+    } finally {
+      setIsTyping(false);
     }
+  };
+
+  const renderFormattedText = (text) => {
+    const parts = text.split(/(\\*\\*.*?\\*\\*|\\*.*?\\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <Text
+            key={index}
+            style={{ fontWeight: "bold", color: styles.text.color }}
+          >
+            {part.slice(2, -2)}
+          </Text>
+        );
+      } else if (part.startsWith("*") && part.endsWith("*")) {
+        return (
+          <Text
+            key={index}
+            style={{ fontStyle: "italic", color: styles.text.color }}
+          >
+            {part.slice(1, -1)}
+          </Text>
+        );
+      }
+      return (
+        <Text key={index} style={styles.text}>
+          {part}
+        </Text>
+      );
+    });
   };
 
   const handleScroll = (event) => {
@@ -73,7 +143,7 @@ export default function ChatScreen() {
               onScroll={handleScroll}
               scrollEventThrottle={16}
               onContentSizeChange={() => {
-                if (isAtBottom) {
+                if (isAtBottom || isTyping) {
                   scrollViewRef.current?.scrollToEnd({ animated: true });
                 }
               }}
@@ -86,9 +156,16 @@ export default function ChatScreen() {
                     msg.sender === "user" ? styles.user : styles.bot,
                   ]}
                 >
-                  <Text style={styles.text}>{msg.text}</Text>
+                  <Text style={styles.text}>
+                    {renderFormattedText(msg.text)}
+                  </Text>
                 </View>
               ))}
+              {isTyping && (
+                <View style={[styles.bubble, styles.botTyping]}>
+                  <Text style={styles.typingText}>{typingText}</Text>
+                </View>
+              )}
             </ScrollView>
 
             <View style={styles.inputContainer}>
@@ -125,6 +202,16 @@ const styles = StyleSheet.create({
   bot: {
     alignSelf: "flex-start",
     backgroundColor: "gray",
+  },
+  botTyping: {
+    alignSelf: "flex-start",
+    backgroundColor: "#e0e0e0",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  typingText: {
+    color: "#505050",
+    fontStyle: "italic",
   },
   text: { color: "white" },
   inputContainer: {

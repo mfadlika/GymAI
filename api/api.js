@@ -1,16 +1,29 @@
 import axios from "axios";
-import { GEMINI_API_KEY } from "@env";
+import { GEMINI_API } from "@env";
+import { getLatestUserData } from "../database/UserDB";
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_URL = GEMINI_API;
 
 export const callGeminiAPI = async (prompt) => {
   try {
+    const userData = await getLatestUserData();
+
+    if (
+      !userData ||
+      typeof userData.weight === "undefined" ||
+      typeof userData.height === "undefined"
+    ) {
+      return "PROFILE_UPDATE_REQUIRED:Silakan update data berat badan dan tinggi badan Anda di profil terlebih dahulu.";
+    }
+
+    const enrichedPrompt = `Data pengguna saat ini: Berat badan ${userData.weight} kg, Tinggi badan ${userData.height} cm. Pertanyaan pengguna: ${prompt}`;
+
     const response = await axios.post(
       GEMINI_URL,
       {
         contents: [
           {
-            parts: [{ text: prompt }],
+            parts: [{ text: enrichedPrompt }],
           },
         ],
       },
@@ -22,7 +35,14 @@ export const callGeminiAPI = async (prompt) => {
     );
     return response.data;
   } catch (error) {
-    console.error("API error:", error);
-    return null;
+    console.error(
+      "API error:",
+      error.response ? error.response.data : error.message
+    );
+
+    if (error.response && error.response.data && error.response.data.error) {
+      return `API Error: ${error.response.data.error.message}`;
+    }
+    return "API_ERROR:Terjadi kesalahan saat menghubungi server API.";
   }
 };
