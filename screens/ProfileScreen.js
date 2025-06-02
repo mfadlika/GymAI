@@ -10,7 +10,7 @@ import {
   ScrollView,
   Button,
   Alert,
-  Switch,
+  TouchableOpacity,
 } from "react-native";
 import photo from "../assets/yudha.jpeg";
 import {
@@ -20,6 +20,16 @@ import {
   getLatestUserDaysPreference,
   updateUserDaysPreference,
 } from "../database/UserDB";
+
+const DAY_LABELS = [
+  { key: "senin", label: "Sen" },
+  { key: "selasa", label: "Sel" },
+  { key: "rabu", label: "Rab" },
+  { key: "kamis", label: "Kam" },
+  { key: "jumat", label: "Jum" },
+  { key: "sabtu", label: "Sab" },
+  { key: "minggu", label: "Min" },
+];
 
 export default function ProfileScreen() {
   const [name, setName] = useState("");
@@ -145,14 +155,50 @@ export default function ProfileScreen() {
           >
             Preferensi Hari Latihan
           </Text>
-          {Object.entries(days).map(([day, value]) => (
-            <View key={day} style={styles.row}>
-              <Text style={styles.label}>
-                {day.charAt(0).toUpperCase() + day.slice(1)}
-              </Text>
-              <Switch value={value} onValueChange={() => toggleDay(day)} />
+          <View style={styles.dayGridWrapper}>
+            <View style={styles.dayGridRow}>
+              {DAY_LABELS.slice(0, 4).map((d) => (
+                <TouchableOpacity
+                  key={d.key}
+                  style={[
+                    styles.dayButton,
+                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                  ]}
+                  onPress={() => toggleDay(d.key)}
+                >
+                  <Text
+                    style={[
+                      styles.dayButtonText,
+                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                    ]}
+                  >
+                    {d.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
-          ))}
+            <View style={styles.dayGridRow}>
+              {DAY_LABELS.slice(4).map((d) => (
+                <TouchableOpacity
+                  key={d.key}
+                  style={[
+                    styles.dayButton,
+                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                  ]}
+                  onPress={() => toggleDay(d.key)}
+                >
+                  <Text
+                    style={[
+                      styles.dayButtonText,
+                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                    ]}
+                  >
+                    {d.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
 
           <Button title="Simpan Data" onPress={handleSave} />
         </View>
@@ -209,6 +255,43 @@ const styles = StyleSheet.create({
     color: "#333",
     borderWidth: 1,
     borderColor: "#ccc",
+  },
+  dayGridWrapper: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  dayGridRow: {
+    flexDirection: "row",
+    justifyContent: "center", // <-- rata tengah
+    marginBottom: 8,
+  },
+  dayButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 4, // <-- lebih rapat
+    marginVertical: 2,
+    borderWidth: 1.5,
+  },
+  dayButtonActive: {
+    backgroundColor: "#007aff",
+    borderColor: "#007aff",
+  },
+  dayButtonInactive: {
+    backgroundColor: "#f0f4f7",
+    borderColor: "#bbb",
+  },
+  dayButtonText: {
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  dayButtonTextActive: {
+    color: "#fff",
+  },
+  dayButtonTextInactive: {
+    color: "#888",
   },
   row: {
     flexDirection: "row",
