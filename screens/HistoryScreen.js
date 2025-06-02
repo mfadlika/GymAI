@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView } from "react-native";
 import { getDBConnection } from "../database/UserDB";
-import * as SQLite from "expo-sqlite";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HistoryScreen() {
   const [schedules, setSchedules] = useState([]);
@@ -34,39 +34,56 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity style={styles.item} onPress={() => handlePress(item)}>
-      <Text style={styles.itemText}>Jadwal dibuat: {item.created_at}</Text>
+      <View style={styles.itemHeader}>
+        <Ionicons name="calendar-outline" size={22} color="#007aff" style={{ marginRight: 10 }} />
+        <Text style={styles.itemText}>Jadwal dibuat: </Text>
+        <Text style={styles.itemDate}>{item.created_at}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color="#888" />
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Riwayat Jadwal Gym</Text>
       {schedules.length === 0 ? (
-        <Text style={styles.text}>Belum ada riwayat</Text>
+        <View style={styles.emptyBox}>
+          <Ionicons name="time-outline" size={48} color="#bbb" />
+          <Text style={styles.text}>Belum ada riwayat</Text>
+        </View>
       ) : (
         <FlatList
           data={schedules}
           keyExtractor={(_, idx) => idx.toString()}
           renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}
 
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Jadwal Gym ({selectedSchedule?.created_at})</Text>
-            <FlatList
-              data={selectedSchedule?.details || []}
-              keyExtractor={(_, idx) => idx.toString()}
-              renderItem={({ item }) => (
-                <View style={styles.scheduleRow}>
-                  <Text style={styles.scheduleText}>
-                    {item.day} - {item.muscle_group} - {item.exercise} ({item.sets} set x {item.reps} reps)
+            <Text style={styles.modalTitle}>
+              <Ionicons name="barbell-outline" size={20} color="#007aff" /> Jadwal Gym
+            </Text>
+            <Text style={styles.modalDate}>{selectedSchedule?.created_at}</Text>
+            <ScrollView style={{ marginTop: 10, marginBottom: 10 }}>
+              {selectedSchedule?.details?.map((item, idx) => (
+                <View key={idx} style={styles.scheduleCard}>
+                  <View style={styles.scheduleRow}>
+                    <Ionicons name="fitness-outline" size={18} color="#007aff" style={{ marginRight: 8 }} />
+                    <Text style={styles.scheduleDay}>{item.day}</Text>
+                    <Text style={styles.scheduleMuscle}> | {item.muscle_group}</Text>
+                  </View>
+                  <Text style={styles.scheduleExercise}>
+                    {item.exercise} <Text style={styles.setReps}>({item.sets} set x {item.reps} reps)</Text>
                   </Text>
                 </View>
-              )}
-            />
+              ))}
+            </ScrollView>
             <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={{ color: "#fff" }}>Tutup</Text>
+              <Ionicons name="close" size={18} color="#fff" />
+              <Text style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}>Tutup</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -76,39 +93,117 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
-  text: { fontSize: 16, color: "#555" },
-  item: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-    width: 320,
-    backgroundColor: "#f9f9f9",
-    marginVertical: 4,
-    borderRadius: 8,
+  container: { flex: 1, backgroundColor: "#f5f7fa", paddingTop: 24 },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#222",
+    alignSelf: "center",
+    marginBottom: 12,
+    letterSpacing: 1,
   },
-  itemText: { fontSize: 15, color: "#222" },
+  emptyBox: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 60,
+  },
+  text: { fontSize: 16, color: "#888", marginTop: 8 },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 18,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  itemHeader: { flexDirection: "row", alignItems: "center" },
+  itemText: { fontSize: 15, color: "#222", fontWeight: "500" },
+  itemDate: { fontSize: 13, color: "#007aff", marginLeft: 4 },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.25)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContent: {
     backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-    width: 340,
+    padding: 22,
+    borderRadius: 16,
+    width: 360,
     maxHeight: "80%",
-  },
-  modalTitle: { fontWeight: "bold", fontSize: 17, marginBottom: 10 },
-  scheduleRow: { marginBottom: 6 },
-  scheduleText: { fontSize: 15, color: "#333" },
-  closeButton: {
-    marginTop: 18,
-    backgroundColor: "#007aff",
-    paddingVertical: 8,
-    borderRadius: 8,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  modalTitle: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#007aff",
+    marginBottom: 2,
+    alignSelf: "center",
+  },
+  modalDate: {
+    fontSize: 13,
+    color: "#888",
+    marginBottom: 10,
+    alignSelf: "center",
+  },
+  scheduleCard: {
+    backgroundColor: "#f1f7ff",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+    shadowColor: "#007aff",
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  scheduleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  scheduleDay: {
+    fontWeight: "bold",
+    color: "#007aff",
+    fontSize: 15,
+  },
+  scheduleMuscle: {
+    fontSize: 14,
+    color: "#444",
+    marginLeft: 2,
+  },
+  scheduleExercise: {
+    fontSize: 15,
+    color: "#222",
+    marginLeft: 26,
+    marginTop: 2,
+  },
+  setReps: {
+    color: "#888",
+    fontSize: 13,
+    fontStyle: "italic",
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#007aff",
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
   },
 });
