@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { callGeminiAPI } from "../api/api";
+import * as FileSystem from "expo-file-system";
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([]);
@@ -67,6 +68,21 @@ export default function ChatScreen() {
       ) {
         const errorMessage = geminiResponse.split(":")[1];
         setMessages((prev) => [...prev, { text: errorMessage, sender: "bot" }]);
+      } else if (geminiResponse?.filePath) {
+        const filePath = geminiResponse.filePath;
+        const csvContent = await FileSystem.readAsStringAsync(filePath);
+
+        const formattedCSV = csvContent
+          .split("\n")
+          .map((line) => line.split(","))
+          .map((row) => row.join(" | "))
+          .join("\n");
+
+        const successMessage = `Jadwal gym telah dibuat:\n${formattedCSV}`;
+        setMessages((prev) => [
+          ...prev,
+          { text: successMessage, sender: "bot" },
+        ]);
       } else {
         const botReply =
           geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text ??
@@ -74,7 +90,6 @@ export default function ChatScreen() {
         setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       }
     } catch (error) {
-
       console.error("ChatScreen error:", error);
       setMessages((prev) => [
         ...prev,

@@ -29,9 +29,9 @@ npm install
 ```
 
 ### 3. Setup Environment Variables
-Buat file .env di root folder dan masukkan API Gemini
+Buat file .env di root folder dan masukkan API Gemini 2.0 Flash
 ```bash
-GEMINI_API_KEY=your_actual_api_key_here
+GEMINI_API=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=your_actual_api_key_here
 ```
 
 ### 4. Run App
