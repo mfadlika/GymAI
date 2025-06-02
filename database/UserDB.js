@@ -44,11 +44,13 @@ export const saveGymScheduleFromCSV = async (csvContent) => {
   const db = await getDBConnection();
   const lines = csvContent.trim().split('\n');
   for (let i = 1; i < lines.length; i++) {
-    const [day, muscleGroup, exercise] = lines[i].split(',');
-    await db.runAsync(
-      `INSERT INTO gym_schedule (day, muscle_group, exercise) VALUES (?, ?, ?);`,
-      [day, muscleGroup, exercise]
-    );
+    const [day, muscleGroup, exercise] = lines[i].split(',').map(s => s.trim());
+    if (day && muscleGroup && exercise) {
+      await db.runAsync(
+        `INSERT INTO gym_schedule (day, muscle_group, exercise) VALUES (?, ?, ?);`,
+        [day, muscleGroup, exercise]
+      );
+    }
   }
 };
 
@@ -58,4 +60,9 @@ export const getLatestUserData = async () => {
     `SELECT * FROM user_info ORDER BY created_at DESC LIMIT 1;`
   );
   return result ?? null;
+};
+
+export const clearGymSchedule = async () => {
+  const db = await getDBConnection();
+  await db.execAsync(`DELETE FROM gym_schedule;`);
 };
