@@ -15,7 +15,7 @@ export default function HistoryScreen() {
   const fetchSchedules = async () => {
     const db = await getDBConnection();
     const result = await db.getAllAsync(
-      `SELECT created_at, GROUP_CONCAT(day || '|' || muscle_group || '|' || exercise, ';') as details
+      `SELECT created_at, GROUP_CONCAT(day || '|' || muscle_group || '|' || exercise || '|' || sets || '|' || reps, ';') as details
        FROM gym_schedule
        GROUP BY created_at
        ORDER BY created_at DESC`
@@ -25,8 +25,8 @@ export default function HistoryScreen() {
 
   const handlePress = (item) => {
     const details = item.details.split(";").map((row) => {
-      const [day, muscle_group, exercise] = row.split("|");
-      return { day, muscle_group, exercise };
+      const [day, muscle_group, exercise, sets, reps] = row.split("|");
+      return { day, muscle_group, exercise, sets, reps };
     });
     setSelectedSchedule({ created_at: item.created_at, details });
     setModalVisible(true);
@@ -59,7 +59,9 @@ export default function HistoryScreen() {
               keyExtractor={(_, idx) => idx.toString()}
               renderItem={({ item }) => (
                 <View style={styles.scheduleRow}>
-                  <Text style={styles.scheduleText}>{item.day} - {item.muscle_group} - {item.exercise}</Text>
+                  <Text style={styles.scheduleText}>
+                    {item.day} - {item.muscle_group} - {item.exercise} ({item.sets} set x {item.reps} reps)
+                  </Text>
                 </View>
               )}
             />
