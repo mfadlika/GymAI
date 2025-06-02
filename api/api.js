@@ -2,6 +2,7 @@ import axios from "axios";
 import { GEMINI_API } from "@env";
 import { getLatestUserData } from "../database/UserDB";
 import * as FileSystem from "expo-file-system";
+import { createGymScheduleTable, saveGymScheduleFromCSV } from "../database/UserDB";
 
 const GEMINI_URL = GEMINI_API;
 
@@ -53,7 +54,6 @@ export const callGeminiAPI = async (prompt) => {
     );
 
     if (prompt.toLowerCase().includes("jadwal gym")) {
-      // Generate default gym schedule CSV
       const csvContent = generateDefaultGymSchedule(
         userData.weight,
         userData.height
@@ -61,6 +61,9 @@ export const callGeminiAPI = async (prompt) => {
       const filePath = `${FileSystem.documentDirectory}gym_schedule.csv`;
 
       await FileSystem.writeAsStringAsync(filePath, csvContent);
+
+      await createGymScheduleTable();
+      await saveGymScheduleFromCSV(csvContent);
 
       return {
         message: "CSV file created successfully.",
