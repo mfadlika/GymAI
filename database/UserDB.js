@@ -27,6 +27,8 @@ export const createGymScheduleTable = async () => {
       day TEXT,
       muscle_group TEXT,
       exercise TEXT,
+      sets INTEGER,
+      reps INTEGER,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -44,11 +46,11 @@ export const saveGymScheduleFromCSV = async (csvContent) => {
   const db = await getDBConnection();
   const lines = csvContent.trim().split('\n');
   for (let i = 1; i < lines.length; i++) {
-    const [day, muscleGroup, exercise] = lines[i].split(',').map(s => s.trim());
-    if (day && muscleGroup && exercise) {
+    const [day, muscleGroup, exercise, sets, reps] = lines[i].split(',').map(s => s.trim());
+    if (day && muscleGroup && exercise && sets && reps) {
       await db.runAsync(
-        `INSERT INTO gym_schedule (day, muscle_group, exercise) VALUES (?, ?, ?);`,
-        [day, muscleGroup, exercise]
+        `INSERT INTO gym_schedule (day, muscle_group, exercise, sets, reps) VALUES (?, ?, ?, ?, ?);`,
+        [day, muscleGroup, exercise, parseInt(sets), parseInt(reps)]
       );
     }
   }

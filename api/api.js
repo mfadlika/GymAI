@@ -7,17 +7,55 @@ import { createGymScheduleTable, saveGymScheduleFromCSV } from "../database/User
 const GEMINI_URL = GEMINI_API;
 
 const generateDefaultGymSchedule = (weight, height) => {
+  // Contoh jadwal lebih lengkap
   const schedule = [
-    { day: "Monday", muscleGroup: "Chest", exercise: "Bench Press" },
-    { day: "Tuesday", muscleGroup: "Back", exercise: "Pull-Ups" },
-    { day: "Wednesday", muscleGroup: "Legs", exercise: "Squats" },
-    { day: "Thursday", muscleGroup: "Shoulders", exercise: "Overhead Press" },
-    { day: "Friday", muscleGroup: "Arms", exercise: "Bicep Curls" },
+    {
+      day: "Monday",
+      details: [
+        { muscleGroup: "Chest", exercise: "Bench Press", sets: 3, reps: 5 },
+        { muscleGroup: "Chest", exercise: "Incline Dumbbell Press", sets: 3, reps: 8 },
+        { muscleGroup: "Triceps", exercise: "Tricep Dips", sets: 3, reps: 10 },
+      ],
+    },
+    {
+      day: "Tuesday",
+      details: [
+        { muscleGroup: "Back", exercise: "Pull-Ups", sets: 3, reps: 8 },
+        { muscleGroup: "Back", exercise: "Barbell Row", sets: 3, reps: 8 },
+        { muscleGroup: "Biceps", exercise: "Barbell Curl", sets: 3, reps: 10 },
+      ],
+    },
+    {
+      day: "Wednesday",
+      details: [
+        { muscleGroup: "Legs", exercise: "Squats", sets: 4, reps: 6 },
+        { muscleGroup: "Legs", exercise: "Leg Press", sets: 3, reps: 10 },
+        { muscleGroup: "Calves", exercise: "Calf Raise", sets: 3, reps: 15 },
+      ],
+    },
+    {
+      day: "Thursday",
+      details: [
+        { muscleGroup: "Shoulders", exercise: "Overhead Press", sets: 3, reps: 8 },
+        { muscleGroup: "Shoulders", exercise: "Lateral Raise", sets: 3, reps: 12 },
+        { muscleGroup: "Traps", exercise: "Shrugs", sets: 3, reps: 12 },
+      ],
+    },
+    {
+      day: "Friday",
+      details: [
+        { muscleGroup: "Arms", exercise: "Bicep Curls", sets: 3, reps: 10 },
+        { muscleGroup: "Arms", exercise: "Tricep Pushdown", sets: 3, reps: 10 },
+        { muscleGroup: "Forearms", exercise: "Wrist Curl", sets: 3, reps: 15 },
+      ],
+    },
   ];
 
-  let csvContent = "Day,Muscle Group,Exercise\n";
+  let csvContent = "Day,Muscle Group,Exercise,Sets,Reps\n";
   schedule.forEach((entry) => {
-    csvContent += `${entry.day},${entry.muscleGroup},${entry.exercise}\n`;
+    entry.details.forEach((detail) => {
+      csvContent += `${entry.day},${detail.muscleGroup},${detail.exercise},${detail.sets},${detail.reps}\n`;
+    });
   });
 
   return csvContent;
