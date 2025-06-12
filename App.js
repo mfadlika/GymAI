@@ -17,6 +17,18 @@ const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
 
 function CustomTabBar({ state, descriptors, navigation }) {
+  const currentRoute = state.routes[state.index];
+  const nestedRoutes = currentRoute.state?.routes;
+  const nestedIndex = currentRoute.state?.index;
+  const nestedRouteName =
+    nestedRoutes && typeof nestedIndex === "number"
+      ? nestedRoutes[nestedIndex].name
+      : null;
+
+  if (currentRoute.name === "Profil" && nestedRouteName === "Setting") {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
