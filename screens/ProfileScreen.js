@@ -12,6 +12,8 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import photo from "../assets/yudha.jpeg";
 import {
   createTable,
@@ -45,6 +47,8 @@ export default function ProfileScreen() {
     minggu: false,
   });
   const [userId, setUserId] = useState(null);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -113,6 +117,14 @@ export default function ProfileScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.card}>
+          {/* Tombol pengaturan di pojok kanan atas card */}
+          <TouchableOpacity
+            style={styles.settingButton}
+            onPress={() => navigation.navigate("Setting")}
+          >
+            <Ionicons name="settings-outline" size={24} color="#333" />
+          </TouchableOpacity>
+
           <Image source={photo} style={styles.avatar} />
 
           <View style={styles.inputContainer}>
@@ -150,9 +162,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          <Text
-            style={[styles.label, { marginTop: 16, marginBottom: 8 }]}
-          >
+          <Text style={[styles.label, { marginTop: 16, marginBottom: 8 }]}>
             Preferensi Hari Latihan
           </Text>
           <View style={styles.dayGridWrapper}>
@@ -162,14 +172,18 @@ export default function ProfileScreen() {
                   key={d.key}
                   style={[
                     styles.dayButton,
-                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                    days[d.key]
+                      ? styles.dayButtonActive
+                      : styles.dayButtonInactive,
                   ]}
                   onPress={() => toggleDay(d.key)}
                 >
                   <Text
                     style={[
                       styles.dayButtonText,
-                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                      days[d.key]
+                        ? styles.dayButtonTextActive
+                        : styles.dayButtonTextInactive,
                     ]}
                   >
                     {d.label}
@@ -183,14 +197,18 @@ export default function ProfileScreen() {
                   key={d.key}
                   style={[
                     styles.dayButton,
-                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                    days[d.key]
+                      ? styles.dayButtonActive
+                      : styles.dayButtonInactive,
                   ]}
                   onPress={() => toggleDay(d.key)}
                 >
                   <Text
                     style={[
                       styles.dayButtonText,
-                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                      days[d.key]
+                        ? styles.dayButtonTextActive
+                        : styles.dayButtonTextInactive,
                     ]}
                   >
                     {d.label}
@@ -228,6 +246,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 8,
+  },
+  settingButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    padding: 6,
+    backgroundColor: "#f0f4f7",
+    borderRadius: 20,
   },
   avatar: {
     width: 120,

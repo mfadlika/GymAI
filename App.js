@@ -11,7 +11,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import ChatScreen from "./screens/ChatScreen";
 import HistoryScreen from "./screens/HistoryScreen";
-import ProfileScreen from "./screens/ProfileScreen";
+import ProfileStack from "./screens/ProfileStack";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
@@ -63,19 +63,11 @@ export default function App() {
       <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}>
         <Tab.Screen name="Chat" component={ChatScreen} />
         <Tab.Screen name="Riwayat" component={HistoryScreen} />
-        <Tab.Screen name="Profil" component={ProfileScreen} />
+        <Tab.Screen name="Profil" component={ProfileStack} />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
-
-const screenStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
 
 const styles = StyleSheet.create({
   container: {
