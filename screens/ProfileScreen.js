@@ -22,6 +22,7 @@ import {
   getLatestUserDaysPreference,
   updateUserDaysPreference,
 } from "../database/UserDB";
+import { useTheme } from "../ThemeContext";
 
 const DAY_LABELS = [
   { key: "senin", label: "Sen" },
@@ -49,6 +50,7 @@ export default function ProfileScreen() {
   const [userId, setUserId] = useState(null);
 
   const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -108,20 +110,23 @@ export default function ProfileScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: isDarkMode ? "#181818" : "#f0f4f7" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          isDarkMode && { backgroundColor: "#181818" },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.card}>
+        <View style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}>
           <TouchableOpacity
-            style={styles.settingButton}
-            onPress={() => navigation.navigate("Setting")}
+            style={[styles.settingButton, isDarkMode && { backgroundColor: "#333" }]}
+            onPress={() => navigation.navigate("Pengaturan")}
           >
-            <Ionicons name="settings-outline" size={24} color="#333" />
+            <Ionicons name="settings-outline" size={24} color={isDarkMode ? "#fff" : "#333"} />
           </TouchableOpacity>
 
           <Image source={photo} style={styles.avatar} />
@@ -288,7 +293,7 @@ const styles = StyleSheet.create({
   },
   dayGridRow: {
     flexDirection: "row",
-    justifyContent: "center", // <-- rata tengah
+    justifyContent: "center",
     marginBottom: 8,
   },
   dayButton: {
@@ -297,7 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 4, // <-- lebih rapat
+    marginHorizontal: 4,
     marginVertical: 2,
     borderWidth: 1.5,
   },
