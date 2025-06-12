@@ -15,8 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { callGeminiAPI } from "../api/api";
 import * as FileSystem from "expo-file-system";
+import { useTheme } from "../ThemeContext";
 
 export default function ChatScreen() {
+  const { isDarkMode } = useTheme();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -142,7 +144,9 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: isDarkMode ? "#181818" : "#f5f5f5" }}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -153,7 +157,7 @@ export default function ChatScreen() {
             <ScrollView
               ref={scrollViewRef}
               style={{ flex: 1 }}
-              contentContainerStyle={styles.messages}
+              contentContainerStyle={{ ...styles.messages }}
               keyboardShouldPersistTaps="handled"
               onScroll={handleScroll}
               scrollEventThrottle={16}
@@ -168,29 +172,66 @@ export default function ChatScreen() {
                   key={idx}
                   style={[
                     styles.bubble,
-                    msg.sender === "user" ? styles.user : styles.bot,
+                    msg.sender === "user"
+                      ? isDarkMode
+                        ? styles.userDark
+                        : styles.user
+                      : isDarkMode
+                      ? styles.botDark
+                      : styles.bot,
                   ]}
                 >
-                  <Text style={styles.text}>
+                  <Text style={[styles.text, isDarkMode && { color: "#fff" }]}>
                     {renderFormattedText(msg.text)}
                   </Text>
                 </View>
               ))}
               {isTyping && (
-                <View style={[styles.bubble, styles.botTyping]}>
-                  <Text style={styles.typingText}>{typingText}</Text>
+                <View
+                  style={[
+                    styles.bubble,
+                    isDarkMode ? styles.botTypingDark : styles.botTyping,
+                  ]}
+                >
+                  <Text
+                    style={[styles.typingText, isDarkMode && { color: "#bbb" }]}
+                  >
+                    {typingText}
+                  </Text>
                 </View>
               )}
             </ScrollView>
 
-            <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.inputContainer,
+                isDarkMode && {
+                  backgroundColor: "#181818",
+                  borderTopWidth: 0,
+                },
+              ]}
+            >
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  isDarkMode && {
+                    backgroundColor: "#232323",
+                    color: "#fff",
+                    borderColor: "#444",
+                  },
+                ]}
                 value={input}
                 onChangeText={setInput}
                 placeholder="Ketik pesan..."
+                placeholderTextColor={isDarkMode ? "#bbb" : "#888"}
               />
-              <TouchableOpacity onPress={handleSend} style={styles.button}>
+              <TouchableOpacity
+                onPress={handleSend}
+                style={[
+                  styles.button,
+                  isDarkMode && { backgroundColor: "#007aff" },
+                ]}
+              >
                 <Ionicons name="send" size={22} color="white" />
               </TouchableOpacity>
             </View>
@@ -233,6 +274,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 20,
     paddingBottom: Platform.OS === "ios" ? 100 : 10,
+    borderTopWidth: 0,
+    backgroundColor: "transparent",
   },
   input: {
     flex: 1,
@@ -240,7 +283,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: "white",
     borderWidth: 0.3,
+    borderColor: "#eee",
     borderRadius: 20,
+    color: "#222",
   },
   button: {
     marginLeft: 10,
@@ -252,5 +297,19 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+  },
+  userDark: {
+    alignSelf: "flex-end",
+    backgroundColor: "#007aff",
+  },
+  botDark: {
+    alignSelf: "flex-start",
+    backgroundColor: "#444",
+  },
+  botTypingDark: {
+    alignSelf: "flex-start",
+    backgroundColor: "#232323",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
   },
 });

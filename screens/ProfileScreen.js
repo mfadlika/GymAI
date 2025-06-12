@@ -12,6 +12,8 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import photo from "../assets/yudha.jpeg";
 import {
   createTable,
@@ -20,6 +22,7 @@ import {
   getLatestUserDaysPreference,
   updateUserDaysPreference,
 } from "../database/UserDB";
+import { useTheme } from "../ThemeContext";
 
 const DAY_LABELS = [
   { key: "senin", label: "Sen" },
@@ -45,6 +48,9 @@ export default function ProfileScreen() {
     minggu: false,
   });
   const [userId, setUserId] = useState(null);
+
+  const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -104,15 +110,25 @@ export default function ProfileScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: isDarkMode ? "#181818" : "#f0f4f7" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
     >
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          isDarkMode && { backgroundColor: "#181818" },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.card}>
+        <View style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}>
+          <TouchableOpacity
+            style={[styles.settingButton, isDarkMode && { backgroundColor: "#333" }]}
+            onPress={() => navigation.navigate("Pengaturan")}
+          >
+            <Ionicons name="settings-outline" size={24} color={isDarkMode ? "#fff" : "#333"} />
+          </TouchableOpacity>
+
           <Image source={photo} style={styles.avatar} />
 
           <View style={styles.inputContainer}>
@@ -150,9 +166,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          <Text
-            style={[styles.label, { marginTop: 16, marginBottom: 8 }]}
-          >
+          <Text style={[styles.label, { marginTop: 16, marginBottom: 8 }]}>
             Preferensi Hari Latihan
           </Text>
           <View style={styles.dayGridWrapper}>
@@ -162,14 +176,18 @@ export default function ProfileScreen() {
                   key={d.key}
                   style={[
                     styles.dayButton,
-                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                    days[d.key]
+                      ? styles.dayButtonActive
+                      : styles.dayButtonInactive,
                   ]}
                   onPress={() => toggleDay(d.key)}
                 >
                   <Text
                     style={[
                       styles.dayButtonText,
-                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                      days[d.key]
+                        ? styles.dayButtonTextActive
+                        : styles.dayButtonTextInactive,
                     ]}
                   >
                     {d.label}
@@ -183,14 +201,18 @@ export default function ProfileScreen() {
                   key={d.key}
                   style={[
                     styles.dayButton,
-                    days[d.key] ? styles.dayButtonActive : styles.dayButtonInactive,
+                    days[d.key]
+                      ? styles.dayButtonActive
+                      : styles.dayButtonInactive,
                   ]}
                   onPress={() => toggleDay(d.key)}
                 >
                   <Text
                     style={[
                       styles.dayButtonText,
-                      days[d.key] ? styles.dayButtonTextActive : styles.dayButtonTextInactive,
+                      days[d.key]
+                        ? styles.dayButtonTextActive
+                        : styles.dayButtonTextInactive,
                     ]}
                   >
                     {d.label}
@@ -229,6 +251,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 8,
   },
+  settingButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    padding: 6,
+    backgroundColor: "#f0f4f7",
+    borderRadius: 20,
+  },
   avatar: {
     width: 120,
     height: 120,
@@ -262,7 +293,7 @@ const styles = StyleSheet.create({
   },
   dayGridRow: {
     flexDirection: "row",
-    justifyContent: "center", // <-- rata tengah
+    justifyContent: "center",
     marginBottom: 8,
   },
   dayButton: {
@@ -271,7 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 4, // <-- lebih rapat
+    marginHorizontal: 4,
     marginVertical: 2,
     borderWidth: 1.5,
   },

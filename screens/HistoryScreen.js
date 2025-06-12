@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView, Alert } from "react-native";
 import { getDBConnection, updateUserDaysPreference, getLatestUserData } from "../database/UserDB";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../ThemeContext";
 
 export default function HistoryScreen() {
+  const { isDarkMode } = useTheme();
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -68,8 +70,8 @@ export default function HistoryScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Riwayat Jadwal Gym</Text>
+    <View style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}>
+      <Text style={[styles.title, isDarkMode && { color: "#fff" }]}>Riwayat Jadwal Gym</Text>
       {schedules.length === 0 ? (
         <View style={styles.emptyBox}>
           <Ionicons name="time-outline" size={48} color="#bbb" />

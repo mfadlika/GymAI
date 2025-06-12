@@ -1,4 +1,5 @@
 import React from "react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 import {
   View,
   Text,
@@ -11,16 +12,27 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import ChatScreen from "./screens/ChatScreen";
 import HistoryScreen from "./screens/HistoryScreen";
-import ProfileScreen from "./screens/ProfileScreen";
+import ProfileStack from "./screens/ProfileStack";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
 
 function CustomTabBar({ state, descriptors, navigation }) {
+  const currentRoute = state.routes[state.index];
+  const nestedRoutes = currentRoute.state?.routes;
+  const nestedIndex = currentRoute.state?.index;
+  const nestedRouteName =
+    nestedRoutes && typeof nestedIndex === "number"
+      ? nestedRoutes[nestedIndex].name
+      : null;
+
+  if (currentRoute.name === "Profil" && nestedRouteName === "Setting") {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
         const isFocused = state.index === index;
 
         const iconName = {
@@ -57,25 +69,39 @@ function CustomTabBar({ state, descriptors, navigation }) {
   );
 }
 
-export default function App() {
+function AppContainer() {
+  const { isDarkMode } = useTheme();
+
   return (
     <NavigationContainer>
-      <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}>
+      <Tab.Navigator
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: isDarkMode ? "#232323" : "#fff",
+          },
+          headerTintColor: isDarkMode ? "#fff" : "#222",
+        }}
+      >
         <Tab.Screen name="Chat" component={ChatScreen} />
         <Tab.Screen name="Riwayat" component={HistoryScreen} />
-        <Tab.Screen name="Profil" component={ProfileScreen} />
+        <Tab.Screen
+          name="Profil"
+          component={ProfileStack}
+          options={{ headerShown: false }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
 }
 
-const screenStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContainer />
+    </ThemeProvider>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
