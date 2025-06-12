@@ -10,14 +10,14 @@ export default function ProfileStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Profile"
+        name="Profil"
         component={ProfileScreen}
-        options={{ headerShown: false }}
+        options={({ title: "Profil" }, { headerShown: true })}
       />
       <Stack.Screen
-        name="Setting"
+        name="Pengaturan"
         component={SettingScreen}
-        options={{ title: "Pengaturan" }}
+        options={({ title: "Pengaturan" }, { headerShown: true })}
       />
     </Stack.Navigator>
   );

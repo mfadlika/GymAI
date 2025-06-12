@@ -117,7 +117,6 @@ export default function ProfileScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.card}>
-          {/* Tombol pengaturan di pojok kanan atas card */}
           <TouchableOpacity
             style={styles.settingButton}
             onPress={() => navigation.navigate("Setting")}

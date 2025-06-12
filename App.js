@@ -32,7 +32,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
         const isFocused = state.index === index;
 
         const iconName = {
@@ -75,7 +74,11 @@ export default function App() {
       <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}>
         <Tab.Screen name="Chat" component={ChatScreen} />
         <Tab.Screen name="Riwayat" component={HistoryScreen} />
-        <Tab.Screen name="Profil" component={ProfileStack} />
+        <Tab.Screen
+          name="Profil"
+          component={ProfileStack}
+          options={{ headerShown: false }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
