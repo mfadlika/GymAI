@@ -84,7 +84,6 @@ const generateDefaultGymSchedule = (weight, height) => {
 export const callGeminiAPI = async (prompt) => {
   try {
     const userData = await getLatestUserData();
-    const userDaysPreference = await getLatestUserDaysPreference();
 
     if (
       !userData ||
@@ -94,7 +93,7 @@ export const callGeminiAPI = async (prompt) => {
       return "PROFILE_UPDATE_REQUIRED:Silakan update data berat badan dan tinggi badan Anda di profil terlebih dahulu.";
     }
 
-    const enrichedPrompt = `Data pengguna saat ini hanya jika pengguna meminta dibuatkan jadwal Gym: Berat badan ${userData.weight} kg, Tinggi badan ${userData.height} cm, Preferensi hari: Senin ${userData.senin}, Selasa ${userData.selasa}, Rabu ${userData.rabu}, Kamis ${userData.kamis}, Jumat ${userData.jumat}, Sabtu ${userData.sabtu}, Minggu ${userData.minggu}. Pertanyaan pengguna: ${prompt}`;
+    const enrichedPrompt = `Data pengguna saat ini hanya jika pengguna meminta dibuatkan jadwal Gym: Berat badan ${userData.weight} kg, Tinggi badan ${userData.height} cm, Preferensi hari: Senin ${userData.senin}, Selasa ${userData.selasa}, Rabu ${userData.rabu}, Kamis ${userData.kamis}, Jumat ${userData.jumat}, Sabtu ${userData.sabtu}, Minggu ${userData.minggu}.\n\nJika pengguna meminta jadwal gym, balaslah hanya dengan format CSV dengan header: Day,Muscle Group,Exercise,Sets,Reps. Jangan tambahkan penjelasan apapun.\n\nPertanyaan pengguna: ${prompt}`;
 
     const response = await axios.post(
       GEMINI_URL,
@@ -112,18 +111,45 @@ export const callGeminiAPI = async (prompt) => {
       }
     );
 
-    if (prompt.toLowerCase().includes("jadwal gym")) {
-      const csvContent = generateDefaultGymSchedule(
-        userData.weight,
-        userData.height
-      );
+    if (
+      prompt.toLowerCase().includes("jadwal gym") ||
+      prompt.toLowerCase().includes("gym schedule") ||
+      prompt.toLowerCase().includes("buatkan jadwal")
+    ) {
+      // Ambil hasil jadwal dari AI (Gemini)
+      let csvContent = null;
+      // Cek jika response.data mengandung CSV
+      if (
+        response.data &&
+        typeof response.data === "string" &&
+        response.data.includes("Day,Muscle Group,Exercise,Sets,Reps")
+      ) {
+        csvContent = response.data;
+      } else if (
+        response.data &&
+        response.data.candidates &&
+        response.data.candidates[0] &&
+        response.data.candidates[0].content &&
+        response.data.candidates[0].content.parts &&
+        response.data.candidates[0].content.parts[0] &&
+        typeof response.data.candidates[0].content.parts[0].text === "string" &&
+        response.data.candidates[0].content.parts[0].text.includes(
+          "Day,Muscle Group,Exercise,Sets,Reps"
+        )
+      ) {
+        csvContent = response.data.candidates[0].content.parts[0].text;
+      }
+      // Jika tidak ada CSV dari AI, fallback ke default
+      if (!csvContent) {
+        csvContent = generateDefaultGymSchedule(
+          userData.weight,
+          userData.height
+        );
+      }
       const filePath = `${FileSystem.documentDirectory}gym_schedule.csv`;
-
       await FileSystem.writeAsStringAsync(filePath, csvContent);
-
       await createGymScheduleTable();
       await saveGymScheduleFromCSV(csvContent);
-
       return {
         message: "CSV file created successfully.",
         filePath,

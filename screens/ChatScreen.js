@@ -228,7 +228,11 @@ export default function ChatScreen() {
               />
               <TouchableOpacity
                 onPress={() => {
-                  /* handleSend */
+                  handleSend();
+                  if (scrollViewRef.current) {
+                    scrollViewRef.current.scrollToEnd({ animated: true });
+                  }
+                  setInput("");
                 }}
                 style={[
                   styles.button,
