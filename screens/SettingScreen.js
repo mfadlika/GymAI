@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
 import { useTheme } from "../ThemeContext";
+import { useLanguage } from "../LanguageContext";
 
 const LANGUAGES = [
   { code: "id", label: "Bahasa Indonesia" },
@@ -9,16 +10,19 @@ const LANGUAGES = [
 
 export default function SettingScreen() {
   const { isDarkMode, toggleTheme } = useTheme();
-  const [language, setLanguage] = useState("id");
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <View
       style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}
     >
+      <Text style={[styles.header, isDarkMode && { color: "#fff" }]}>
+        {t("settings")}
+      </Text>
       <View style={styles.list}>
         <View style={[styles.item, isDarkMode && styles.itemDark]}>
           <Text style={[styles.itemText, isDarkMode && { color: "#fff" }]}>
-            Mode Gelap
+            {t("darkMode")}
           </Text>
           <Switch
             value={isDarkMode}
@@ -35,7 +39,7 @@ export default function SettingScreen() {
           ]}
         >
           <Text style={[styles.itemText, isDarkMode && { color: "#fff" }]}>
-            Bahasa
+            {t("language")}
           </Text>
           <View style={{ flexDirection: "row", marginTop: 8 }}>
             {LANGUAGES.map((lang) => (

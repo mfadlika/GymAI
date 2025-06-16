@@ -1,5 +1,6 @@
 import React from "react";
 import { ThemeProvider, useTheme } from "./ThemeContext";
+import { LanguageProvider } from "./LanguageContext";
 import {
   View,
   Text,
@@ -98,7 +99,9 @@ function AppContainer() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContainer />
+      <LanguageProvider>
+        <AppContainer />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
