@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider, useTheme } from "./ThemeContext";
-import { LanguageProvider } from "./LanguageContext";
+import { LanguageProvider, useLanguage } from "./LanguageContext";
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
 
 function CustomTabBar({ state, descriptors, navigation }) {
+  const { t } = useLanguage();
   const currentRoute = state.routes[state.index];
   const nestedRoutes = currentRoute.state?.routes;
   const nestedIndex = currentRoute.state?.index;
@@ -42,6 +43,12 @@ function CustomTabBar({ state, descriptors, navigation }) {
           Profil: "person-outline",
         }[route.name];
 
+        const label = {
+          Chat: t("chat"),
+          Riwayat: t("history"),
+          Profil: t("profile"),
+        }[route.name];
+
         const onPress = () => {
           if (!isFocused) navigation.navigate(route.name);
         };
@@ -61,7 +68,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
             <Text
               style={{ color: isFocused ? "#007aff" : "#888", fontSize: 12 }}
             >
-              {route.name}
+              {label}
             </Text>
           </TouchableOpacity>
         );

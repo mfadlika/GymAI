@@ -121,12 +121,21 @@ export default function ProfileScreen() {
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}>
+        <View
+          style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}
+        >
           <TouchableOpacity
-            style={[styles.settingButton, isDarkMode && { backgroundColor: "#333" }]}
-            onPress={() => navigation.navigate("Pengaturan")}
+            style={[
+              styles.settingButton,
+              isDarkMode && { backgroundColor: "#333" },
+            ]}
+            onPress={() => navigation.navigate("Setting")}
           >
-            <Ionicons name="settings-outline" size={24} color={isDarkMode ? "#fff" : "#333"} />
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={isDarkMode ? "#fff" : "#333"}
+            />
           </TouchableOpacity>
 
           <Image source={photo} style={styles.avatar} />

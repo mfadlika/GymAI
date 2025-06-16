@@ -16,9 +16,6 @@ export default function SettingScreen() {
     <View
       style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}
     >
-      <Text style={[styles.header, isDarkMode && { color: "#fff" }]}>
-        {t("settings")}
-      </Text>
       <View style={styles.list}>
         <View style={[styles.item, isDarkMode && styles.itemDark]}>
           <Text style={[styles.itemText, isDarkMode && { color: "#fff" }]}>
