@@ -10,6 +10,7 @@ export const createTable = async () => {
   const db = await getDBConnection();
   await db.execAsync(`DROP TABLE IF EXISTS user_info;`);
   await db.execAsync(`DROP TABLE IF EXISTS gym_schedule;`);
+  await db.execAsync(`DROP TABLE IF EXISTS chat_history;`);
 
   // Recreate tables
   await db.execAsync(`
@@ -40,6 +41,15 @@ export const createTable = async () => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS chat_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_message TEXT,
+      bot_reply TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 };
 
 export const createGymScheduleTable = async () => {
@@ -55,6 +65,37 @@ export const createGymScheduleTable = async () => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
+};
+
+// Membuat tabel chat_history jika belum ada
+export const createChatHistoryTable = async () => {
+  const db = await getDBConnection();
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS chat_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_message TEXT,
+      bot_reply TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+};
+
+// Simpan chat ke history
+export const saveChatHistory = async (userMessage, botReply) => {
+  const db = await getDBConnection();
+  await db.runAsync(
+    `INSERT INTO chat_history (user_message, bot_reply) VALUES (?, ?);`,
+    [userMessage, botReply]
+  );
+};
+
+// Ambil semua history chat (terbaru dulu)
+export const getAllChatHistory = async () => {
+  const db = await getDBConnection();
+  const results = await db.getAllAsync(
+    `SELECT * FROM chat_history ORDER BY created_at DESC;`
+  );
+  return results;
 };
 
 export const saveUserData = async (name, weight, height) => {
