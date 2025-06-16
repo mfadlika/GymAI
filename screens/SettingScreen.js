@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
 import { useTheme } from "../ThemeContext";
 
+const LANGUAGES = [
+  { code: "id", label: "Bahasa Indonesia" },
+  { code: "en", label: "English" },
+];
+
 export default function SettingScreen() {
   const { isDarkMode, toggleTheme } = useTheme();
+  const [language, setLanguage] = useState("id");
 
   return (
     <View
@@ -21,19 +27,44 @@ export default function SettingScreen() {
             trackColor={{ false: "#bbb", true: "#444" }}
           />
         </View>
-        <TouchableOpacity style={[styles.item, isDarkMode && styles.itemDark]}>
+        <View
+          style={[
+            styles.item,
+            isDarkMode && styles.itemDark,
+            { flexDirection: "column", alignItems: "flex-start" },
+          ]}
+        >
           <Text style={[styles.itemText, isDarkMode && { color: "#fff" }]}>
-            Notifikasi
+            Bahasa
           </Text>
-          <Text style={[styles.itemValue, isDarkMode && { color: "#bbb" }]}>
-            Aktif
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.item, isDarkMode && styles.itemDark]}>
-          <Text style={[styles.itemText, isDarkMode && { color: "#fff" }]}>
-            Tentang Aplikasi
-          </Text>
-        </TouchableOpacity>
+          <View style={{ flexDirection: "row", marginTop: 8 }}>
+            {LANGUAGES.map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.langButton,
+                  language === lang.code &&
+                    (isDarkMode
+                      ? styles.langButtonActiveDark
+                      : styles.langButtonActive),
+                ]}
+                onPress={() => setLanguage(lang.code)}
+              >
+                <Text
+                  style={[
+                    styles.langButtonText,
+                    language === lang.code && { color: "#fff" },
+                    isDarkMode && {
+                      color: language === lang.code ? "#fff" : "#bbb",
+                    },
+                  ]}
+                >
+                  {lang.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -75,8 +106,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#222",
   },
-  itemValue: {
+  langButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#bbb",
+    marginRight: 10,
+    backgroundColor: "#f0f4f7",
+  },
+  langButtonActive: {
+    backgroundColor: "#007aff",
+    borderColor: "#007aff",
+  },
+  langButtonActiveDark: {
+    backgroundColor: "#444",
+    borderColor: "#fff",
+  },
+  langButtonText: {
     fontSize: 15,
-    color: "#888",
+    color: "#222",
   },
 });
