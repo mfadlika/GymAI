@@ -61,4 +61,4 @@ MobileApp/
 
 - [Fadli M](https://github.com/mfadlika)
 - [Yudha R A](https://github.com/YudhaRizkyAbdullah)
-- [Rifqi A G] (https://github.com/rifqialghani2)
+- [Rifqi A G](https://github.com/rifqialghani2)
