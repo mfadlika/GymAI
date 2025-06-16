@@ -20,6 +20,8 @@ const translations = {
     trainingDays: "Preferensi Hari Latihan",
     noHistory: "Belum ada riwayat",
     scheduleHistory: "Riwayat Jadwal Gym",
+    inputMessage: "Ketik pesan...",
+    botTyping: "Bot sedang mengetik",
     // ...tambahkan sesuai kebutuhan...
   },
   en: {
@@ -39,6 +41,8 @@ const translations = {
     trainingDays: "Training Days Preference",
     noHistory: "No history yet",
     scheduleHistory: "Gym Schedule History",
+    inputMessage: "Type a message...",
+    botTyping: "Bot is typing",
     // ...tambahkan sesuai kebutuhan...
   },
 };
