@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Modal, ScrollView, Alert } from "react-native";
-import { getDBConnection, updateUserDaysPreference, getLatestUserData } from "../database/UserDB";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Modal,
+  ScrollView,
+  Alert,
+} from "react-native";
+import {
+  getDBConnection,
+  updateUserDaysPreference,
+  getLatestUserData,
+} from "../database/UserDB";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../ThemeContext";
+import { useLanguage } from "../LanguageContext";
 
 export default function HistoryScreen() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +58,9 @@ export default function HistoryScreen() {
 
   const handleSavePreference = async () => {
     if (!selectedSchedule || !userId) return;
-    const daysInSchedule = selectedSchedule.details.map(d => d.day.toLowerCase());
+    const daysInSchedule = selectedSchedule.details.map((d) =>
+      d.day.toLowerCase()
+    );
     const hariPref = {
       senin: daysInSchedule.includes("monday") ? 1 : 0,
       selasa: daysInSchedule.includes("tuesday") ? 1 : 0,
@@ -61,7 +78,12 @@ export default function HistoryScreen() {
   const renderItem = ({ item, index }) => (
     <TouchableOpacity style={styles.item} onPress={() => handlePress(item)}>
       <View style={styles.itemHeader}>
-        <Ionicons name="calendar-outline" size={22} color="#007aff" style={{ marginRight: 10 }} />
+        <Ionicons
+          name="calendar-outline"
+          size={22}
+          color="#007aff"
+          style={{ marginRight: 10 }}
+        />
         <Text style={styles.itemText}>Jadwal dibuat: </Text>
         <Text style={styles.itemDate}>{item.created_at}</Text>
       </View>
@@ -70,12 +92,16 @@ export default function HistoryScreen() {
   );
 
   return (
-    <View style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}>
-      <Text style={[styles.title, isDarkMode && { color: "#fff" }]}>Riwayat Jadwal Gym</Text>
+    <View
+      style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}
+    >
+      <Text style={[styles.title, isDarkMode && { color: "#fff" }]}>
+        {t("scheduleHistory")}
+      </Text>
       {schedules.length === 0 ? (
         <View style={styles.emptyBox}>
           <Ionicons name="time-outline" size={48} color="#bbb" />
-          <Text style={styles.text}>Belum ada riwayat</Text>
+          <Text style={styles.text}>{t("noHistory")}</Text>
         </View>
       ) : (
         <FlatList
@@ -90,30 +116,56 @@ export default function HistoryScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              <Ionicons name="barbell-outline" size={20} color="#007aff" /> Jadwal Gym
+              <Ionicons name="barbell-outline" size={20} color="#007aff" />{" "}
+              Jadwal Gym
             </Text>
             <Text style={styles.modalDate}>{selectedSchedule?.created_at}</Text>
             <ScrollView style={{ marginTop: 10, marginBottom: 10 }}>
               {selectedSchedule?.details?.map((item, idx) => (
                 <View key={idx} style={styles.scheduleCard}>
                   <View style={styles.scheduleRow}>
-                    <Ionicons name="fitness-outline" size={18} color="#007aff" style={{ marginRight: 8 }} />
+                    <Ionicons
+                      name="fitness-outline"
+                      size={18}
+                      color="#007aff"
+                      style={{ marginRight: 8 }}
+                    />
                     <Text style={styles.scheduleDay}>{item.day}</Text>
-                    <Text style={styles.scheduleMuscle}> | {item.muscle_group}</Text>
+                    <Text style={styles.scheduleMuscle}>
+                      {" "}
+                      | {item.muscle_group}
+                    </Text>
                   </View>
                   <Text style={styles.scheduleExercise}>
-                    {item.exercise} <Text style={styles.setReps}>({item.sets} set x {item.reps} reps)</Text>
+                    {item.exercise}{" "}
+                    <Text style={styles.setReps}>
+                      ({item.sets} set x {item.reps} reps)
+                    </Text>
                   </Text>
                 </View>
               ))}
             </ScrollView>
-            <TouchableOpacity style={styles.saveButton} onPress={handleSavePreference}>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSavePreference}
+            >
               <Ionicons name="save-outline" size={18} color="#fff" />
-              <Text style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}>Jadikan Preferensi Hari</Text>
+              <Text
+                style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}
+              >
+                Jadikan Preferensi Hari
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
               <Ionicons name="close" size={18} color="#fff" />
-              <Text style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}>Tutup</Text>
+              <Text
+                style={{ color: "#fff", marginLeft: 6, fontWeight: "bold" }}
+              >
+                Tutup
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

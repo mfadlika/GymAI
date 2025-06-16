@@ -16,13 +16,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { callGeminiAPI } from "../api/api";
 import * as FileSystem from "expo-file-system";
 import { useTheme } from "../ThemeContext";
+import { useLanguage } from "../LanguageContext";
 
 export default function ChatScreen() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [typingText, setTypingText] = useState("Bot sedang mengetik");
+  const [typingDots, setTypingDots] = useState("");
   const scrollViewRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = React.useState(true);
 
@@ -35,10 +37,10 @@ export default function ChatScreen() {
         if (dots.length > 3) {
           dots = "";
         }
-        setTypingText(`Bot sedang mengetik${dots}`);
+        setTypingDots(dots);
       }, 500);
     } else {
-      setTypingText("Bot sedang mengetik");
+      setTypingDots("");
     }
     return () => clearInterval(interval);
   }, [isTyping]);
@@ -182,7 +184,8 @@ export default function ChatScreen() {
                   ]}
                 >
                   <Text style={[styles.text, isDarkMode && { color: "#fff" }]}>
-                    {renderFormattedText(msg.text)}
+                    {/* ...renderFormattedText(msg.text) jika ada... */}
+                    {msg.text}
                   </Text>
                 </View>
               ))}
@@ -196,19 +199,17 @@ export default function ChatScreen() {
                   <Text
                     style={[styles.typingText, isDarkMode && { color: "#bbb" }]}
                   >
-                    {typingText}
+                    {t("botTyping")}
+                    {typingDots}
                   </Text>
                 </View>
               )}
             </ScrollView>
-
+            {/* Input */}
             <View
               style={[
                 styles.inputContainer,
-                isDarkMode && {
-                  backgroundColor: "#181818",
-                  borderTopWidth: 0,
-                },
+                isDarkMode && { backgroundColor: "transparent" },
               ]}
             >
               <TextInput
@@ -222,11 +223,13 @@ export default function ChatScreen() {
                 ]}
                 value={input}
                 onChangeText={setInput}
-                placeholder="Ketik pesan..."
+                placeholder={t("inputMessage")}
                 placeholderTextColor={isDarkMode ? "#bbb" : "#888"}
               />
               <TouchableOpacity
-                onPress={handleSend}
+                onPress={() => {
+                  /* handleSend */
+                }}
                 style={[
                   styles.button,
                   isDarkMode && { backgroundColor: "#007aff" },

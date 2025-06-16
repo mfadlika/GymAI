@@ -3,19 +3,21 @@ import { createStackNavigator } from "@react-navigation/stack";
 import ProfileScreen from "./ProfileScreen";
 import SettingScreen from "./SettingScreen";
 import { useTheme } from "../ThemeContext";
+import { useLanguage } from "../LanguageContext";
 
 const Stack = createStackNavigator();
 
 export default function ProfileStack() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Profil"
+        name="Profile"
         component={ProfileScreen}
         options={{
-          title: "Profil",
+          title: t("profile"),
           headerShown: true,
           headerStyle: {
             backgroundColor: isDarkMode ? "#232323" : "#fff",
@@ -24,10 +26,10 @@ export default function ProfileStack() {
         }}
       />
       <Stack.Screen
-        name="Pengaturan"
+        name="Setting" // <-- ini nama screen
         component={SettingScreen}
         options={{
-          title: "Pengaturan",
+          title: t("settings"),
           headerStyle: {
             backgroundColor: isDarkMode ? "#232323" : "#fff",
           },

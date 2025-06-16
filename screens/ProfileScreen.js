@@ -23,16 +23,7 @@ import {
   updateUserDaysPreference,
 } from "../database/UserDB";
 import { useTheme } from "../ThemeContext";
-
-const DAY_LABELS = [
-  { key: "senin", label: "Sen" },
-  { key: "selasa", label: "Sel" },
-  { key: "rabu", label: "Rab" },
-  { key: "kamis", label: "Kam" },
-  { key: "jumat", label: "Jum" },
-  { key: "sabtu", label: "Sab" },
-  { key: "minggu", label: "Min" },
-];
+import { useLanguage } from "../LanguageContext";
 
 export default function ProfileScreen() {
   const [name, setName] = useState("");
@@ -51,6 +42,17 @@ export default function ProfileScreen() {
 
   const navigation = useNavigation();
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
+
+  const DAY_LABELS = [
+    { key: "senin", label: t("senin") },
+    { key: "selasa", label: t("selasa") },
+    { key: "rabu", label: t("rabu") },
+    { key: "kamis", label: t("kamis") },
+    { key: "jumat", label: t("jumat") },
+    { key: "sabtu", label: t("sabtu") },
+    { key: "minggu", label: t("minggu") },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -121,53 +123,62 @@ export default function ProfileScreen() {
         ]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}>
+        <View
+          style={[styles.card, isDarkMode && { backgroundColor: "#232323" }]}
+        >
           <TouchableOpacity
-            style={[styles.settingButton, isDarkMode && { backgroundColor: "#333" }]}
-            onPress={() => navigation.navigate("Pengaturan")}
+            style={[
+              styles.settingButton,
+              isDarkMode && { backgroundColor: "#333" },
+            ]}
+            onPress={() => navigation.navigate("Setting")}
           >
-            <Ionicons name="settings-outline" size={24} color={isDarkMode ? "#fff" : "#333"} />
+            <Ionicons
+              name="settings-outline"
+              size={24}
+              color={isDarkMode ? "#fff" : "#333"}
+            />
           </TouchableOpacity>
 
           <Image source={photo} style={styles.avatar} />
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Nama</Text>
+            <Text style={styles.label}>{t("name")}</Text>
             <TextInput
               value={name}
               onChangeText={setName}
               style={styles.input}
-              placeholder="Masukkan nama"
+              placeholder={t("inputName")}
               placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Berat Badan (kg)</Text>
+            <Text style={styles.label}>{t("weight")}</Text>
             <TextInput
               value={weight}
               onChangeText={setWeight}
               style={styles.input}
               keyboardType="numeric"
-              placeholder="Masukkan berat badan"
+              placeholder={t("inputWeight")}
               placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tinggi Badan (cm)</Text>
+            <Text style={styles.label}>{t("height")}</Text>
             <TextInput
               value={height}
               onChangeText={setHeight}
               style={styles.input}
               keyboardType="numeric"
-              placeholder="Masukkan tinggi badan"
+              placeholder={t("inputHeight")}
               placeholderTextColor="#999"
             />
           </View>
 
           <Text style={[styles.label, { marginTop: 16, marginBottom: 8 }]}>
-            Preferensi Hari Latihan
+            {t("trainingDays")}
           </Text>
           <View style={styles.dayGridWrapper}>
             <View style={styles.dayGridRow}>
@@ -222,7 +233,7 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Button title="Simpan Data" onPress={handleSave} />
+          <Button title={t("save")} onPress={handleSave} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
