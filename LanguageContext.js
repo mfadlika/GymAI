@@ -22,7 +22,13 @@ const translations = {
     scheduleHistory: "Riwayat Jadwal Gym",
     inputMessage: "Ketik pesan...",
     botTyping: "Bot sedang mengetik",
-    // ...tambahkan sesuai kebutuhan...
+    senin: "Sen",
+    selasa: "Sel",
+    rabu: "Rab",
+    kamis: "Kam",
+    jumat: "Jum",
+    sabtu: "Sab",
+    minggu: "Min",
   },
   en: {
     settings: "Settings",
@@ -43,7 +49,13 @@ const translations = {
     scheduleHistory: "Gym Schedule History",
     inputMessage: "Type a message...",
     botTyping: "Bot is typing",
-    // ...tambahkan sesuai kebutuhan...
+    senin: "Mon",
+    selasa: "Tue",
+    rabu: "Wed",
+    kamis: "Thu",
+    jumat: "Fri",
+    sabtu: "Sat",
+    minggu: "Sun",
   },
 };
 
