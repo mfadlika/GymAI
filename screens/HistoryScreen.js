@@ -13,6 +13,7 @@ import {
   getDBConnection,
   updateUserDaysPreference,
   getLatestUserData,
+  getAllChatHistory,
 } from "../database/UserDB";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../ThemeContext";
@@ -25,10 +26,12 @@ export default function HistoryScreen() {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
 
   useEffect(() => {
     fetchSchedules();
     fetchUserId();
+    fetchChatHistory();
   }, []);
 
   const fetchSchedules = async () => {
@@ -45,6 +48,11 @@ export default function HistoryScreen() {
   const fetchUserId = async () => {
     const user = await getLatestUserData();
     if (user) setUserId(user.id);
+  };
+
+  const fetchChatHistory = async () => {
+    const result = await getAllChatHistory();
+    setChatHistory(result);
   };
 
   const handlePress = (item) => {
@@ -93,11 +101,8 @@ export default function HistoryScreen() {
 
   return (
     <View
-      style={[styles.container, isDarkMode && { backgroundColor: "#181818" }]}
+      style={{ flex: 1, backgroundColor: isDarkMode ? "#181818" : "#f5f5f5" }}
     >
-      <Text style={[styles.title, isDarkMode && { color: "#fff" }]}>
-        {t("scheduleHistory")}
-      </Text>
       {schedules.length === 0 ? (
         <View style={styles.emptyBox}>
           <Ionicons name="time-outline" size={48} color="#bbb" />

@@ -84,7 +84,6 @@ const generateDefaultGymSchedule = (weight, height) => {
 export const callGeminiAPI = async (prompt) => {
   try {
     const userData = await getLatestUserData();
-    const userDaysPreference = await getLatestUserDaysPreference();
 
     if (
       !userData ||
@@ -94,7 +93,18 @@ export const callGeminiAPI = async (prompt) => {
       return "PROFILE_UPDATE_REQUIRED:Silakan update data berat badan dan tinggi badan Anda di profil terlebih dahulu.";
     }
 
-    const enrichedPrompt = `Data pengguna saat ini hanya jika pengguna meminta dibuatkan jadwal Gym: Berat badan ${userData.weight} kg, Tinggi badan ${userData.height} cm, Preferensi hari: Senin ${userData.senin}, Selasa ${userData.selasa}, Rabu ${userData.rabu}, Kamis ${userData.kamis}, Jumat ${userData.jumat}, Sabtu ${userData.sabtu}, Minggu ${userData.minggu}. Pertanyaan pengguna: ${prompt}`;
+    // Deteksi permintaan jadwal gym
+    const isGymScheduleRequest =
+      prompt.toLowerCase().includes("jadwal gym") ||
+      prompt.toLowerCase().includes("gym schedule") ||
+      prompt.toLowerCase().includes("buatkan jadwal");
+
+    let enrichedPrompt = `Data pengguna saat ini: Berat badan ${userData.weight} kg, Tinggi badan ${userData.height} cm, Preferensi hari: Senin ${userData.senin}, Selasa ${userData.selasa}, Rabu ${userData.rabu}, Kamis ${userData.kamis}, Jumat ${userData.jumat}, Sabtu ${userData.sabtu}, Minggu ${userData.minggu}.`;
+    if (isGymScheduleRequest) {
+      enrichedPrompt +=
+        "\n\nBalas dengan penjelasan singkat dan juga lampirkan jadwal gym dalam format CSV (header: Day,Muscle Group,Exercise,Sets,Reps).";
+    }
+    enrichedPrompt += `\n\nPertanyaan pengguna: ${prompt}`;
 
     const response = await axios.post(
       GEMINI_URL,
@@ -112,21 +122,45 @@ export const callGeminiAPI = async (prompt) => {
       }
     );
 
-    if (prompt.toLowerCase().includes("jadwal gym")) {
-      const csvContent = generateDefaultGymSchedule(
-        userData.weight,
-        userData.height
-      );
+    if (isGymScheduleRequest) {
+      // Ambil hasil jadwal dari AI (Gemini)
+      let csvContent = null;
+      let explanation = null;
+      // Cek jika response.data mengandung CSV dan penjelasan
+      if (
+        response.data &&
+        response.data.candidates &&
+        response.data.candidates[0] &&
+        response.data.candidates[0].content &&
+        response.data.candidates[0].content.parts &&
+        response.data.candidates[0].content.parts[0] &&
+        typeof response.data.candidates[0].content.parts[0].text === "string"
+      ) {
+        const aiText = response.data.candidates[0].content.parts[0].text;
+        // Pisahkan penjelasan dan CSV jika ada
+        const csvIndex = aiText.indexOf("Day,Muscle Group,Exercise,Sets,Reps");
+        if (csvIndex !== -1) {
+          explanation = aiText.substring(0, csvIndex).trim();
+          csvContent = aiText.substring(csvIndex).trim();
+        } else {
+          explanation = aiText;
+        }
+      }
+      // Jika tidak ada CSV dari AI, fallback ke default
+      if (!csvContent) {
+        csvContent = generateDefaultGymSchedule(
+          userData.weight,
+          userData.height
+        );
+      }
       const filePath = `${FileSystem.documentDirectory}gym_schedule.csv`;
-
       await FileSystem.writeAsStringAsync(filePath, csvContent);
-
       await createGymScheduleTable();
       await saveGymScheduleFromCSV(csvContent);
-
       return {
         message: "CSV file created successfully.",
         filePath,
+        explanation,
         response: response.data,
       };
     }

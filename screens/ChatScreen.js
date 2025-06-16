@@ -17,6 +17,7 @@ import { callGeminiAPI } from "../api/api";
 import * as FileSystem from "expo-file-system";
 import { useTheme } from "../ThemeContext";
 import { useLanguage } from "../LanguageContext";
+import { createChatHistoryTable, saveChatHistory } from "../database/UserDB";
 
 export default function ChatScreen() {
   const { isDarkMode } = useTheme();
@@ -27,6 +28,11 @@ export default function ChatScreen() {
   const [typingDots, setTypingDots] = useState("");
   const scrollViewRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = React.useState(true);
+
+  useEffect(() => {
+    // Pastikan tabel chat_history sudah ada
+    createChatHistoryTable();
+  }, []);
 
   useEffect(() => {
     let interval;
@@ -47,51 +53,54 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     if (input.trim() === "") return;
-
     const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     const prompt = input;
     setInput("");
     setIsTyping(true);
-
     try {
       const geminiResponse = await callGeminiAPI(prompt);
-
+      let botReply = "";
       if (
         typeof geminiResponse === "string" &&
         geminiResponse.startsWith("PROFILE_UPDATE_REQUIRED:")
       ) {
-        const updateMessage = geminiResponse.split(":")[1];
-        setMessages((prev) => [
-          ...prev,
-          { text: updateMessage, sender: "bot" },
-        ]);
+        botReply = geminiResponse.split(":")[1];
+        setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       } else if (
         typeof geminiResponse === "string" &&
         geminiResponse.startsWith("API_ERROR:")
       ) {
-        const errorMessage = geminiResponse.split(":")[1];
-        setMessages((prev) => [...prev, { text: errorMessage, sender: "bot" }]);
+        botReply = geminiResponse.split(":")[1];
+        setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       } else if (geminiResponse?.filePath) {
         const filePath = geminiResponse.filePath;
         const csvContent = await FileSystem.readAsStringAsync(filePath);
-
+        let chatText = "";
+        if (geminiResponse.explanation) {
+          chatText += geminiResponse.explanation + "\n\n";
+        }
         const formattedCSV = csvContent
           .split("\n")
           .map((line) => line.split(","))
           .map((row) => row.join(" | "))
           .join("\n");
-
-        const successMessage = `Jadwal gym telah dibuat:\n${formattedCSV}`;
-        setMessages((prev) => [
-          ...prev,
-          { text: successMessage, sender: "bot" },
-        ]);
+        chatText += `Jadwal gym telah dibuat:\n${formattedCSV}`;
+        botReply = chatText;
+        setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       } else {
-        const botReply =
+        botReply =
           geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text ??
           "Maaf, saya tidak dapat memberikan jawaban.";
         setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
+      }
+      // Simpan ke history jika permintaan jadwal gym
+      if (
+        prompt.toLowerCase().includes("jadwal gym") ||
+        prompt.toLowerCase().includes("gym schedule") ||
+        prompt.toLowerCase().includes("buatkan jadwal")
+      ) {
+        await saveChatHistory(prompt, botReply);
       }
     } catch (error) {
       console.error("ChatScreen error:", error);
@@ -184,8 +193,7 @@ export default function ChatScreen() {
                   ]}
                 >
                   <Text style={[styles.text, isDarkMode && { color: "#fff" }]}>
-                    {/* ...renderFormattedText(msg.text) jika ada... */}
-                    {msg.text}
+                    {renderFormattedText(msg.text)}
                   </Text>
                 </View>
               ))}
@@ -228,7 +236,11 @@ export default function ChatScreen() {
               />
               <TouchableOpacity
                 onPress={() => {
-                  /* handleSend */
+                  handleSend();
+                  if (scrollViewRef.current) {
+                    scrollViewRef.current.scrollToEnd({ animated: true });
+                  }
+                  setInput("");
                 }}
                 style={[
                   styles.button,
