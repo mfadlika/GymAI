@@ -1,13 +1,10 @@
-import axios from "axios";
 import { GEMINI_API } from "@env";
-import {
-  getLatestUserData,
-  getLatestUserDaysPreference,
-} from "../database/UserDB";
+import axios from "axios";
 import * as FileSystem from "expo-file-system";
 import {
   createGymScheduleTable,
-  saveGymScheduleFromCSV,
+  getLatestUserData,
+  saveGymScheduleFromCSV
 } from "../database/UserDB";
 
 const GEMINI_URL = GEMINI_API;
@@ -137,7 +134,6 @@ export const callGeminiAPI = async (prompt) => {
         typeof response.data.candidates[0].content.parts[0].text === "string"
       ) {
         const aiText = response.data.candidates[0].content.parts[0].text;
-        // Pisahkan penjelasan dan CSV jika ada
         const csvIndex = aiText.indexOf("Day,Muscle Group,Exercise,Sets,Reps");
         if (csvIndex !== -1) {
           explanation = aiText.substring(0, csvIndex).trim();
