@@ -1,18 +1,18 @@
-import { ThemeProvider, useTheme } from "./ThemeContext";
-import { LanguageProvider, useLanguage } from "./LanguageContext";
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
 import {
-  View,
+  Dimensions,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  Dimensions,
+  View,
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { LanguageProvider, useLanguage } from "./LanguageContext";
 import ChatScreen from "./screens/ChatScreen";
 import HistoryScreen from "./screens/HistoryScreen";
 import ProfileStack from "./screens/ProfileStack";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
