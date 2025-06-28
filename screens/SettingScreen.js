@@ -1,7 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
-import { useTheme } from "../ThemeContext";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
 
 const LANGUAGES = [
   { code: "id", label: "Bahasa Indonesia" },
