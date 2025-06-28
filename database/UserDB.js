@@ -12,7 +12,6 @@ export const createTable = async () => {
   await db.execAsync(`DROP TABLE IF EXISTS gym_schedule;`);
   await db.execAsync(`DROP TABLE IF EXISTS chat_history;`);
 
-  // Recreate tables
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS user_info (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +66,6 @@ export const createGymScheduleTable = async () => {
   `);
 };
 
-// Membuat tabel chat_history jika belum ada
 export const createChatHistoryTable = async () => {
   const db = await getDBConnection();
   await db.execAsync(`
@@ -80,7 +78,6 @@ export const createChatHistoryTable = async () => {
   `);
 };
 
-// Simpan chat ke history
 export const saveChatHistory = async (userMessage, botReply) => {
   const db = await getDBConnection();
   await db.runAsync(
@@ -89,7 +86,6 @@ export const saveChatHistory = async (userMessage, botReply) => {
   );
 };
 
-// Ambil semua history chat (terbaru dulu)
 export const getAllChatHistory = async () => {
   const db = await getDBConnection();
   const results = await db.getAllAsync(
@@ -135,7 +131,6 @@ export const clearGymSchedule = async () => {
   await db.execAsync(`DELETE FROM gym_schedule;`);
 };
 
-// Fungsi untuk update preferensi hari
 export const updateUserDaysPreference = async (id, days) => {
   const db = await getDBConnection();
   await db.runAsync(
@@ -155,7 +150,6 @@ export const updateUserDaysPreference = async (id, days) => {
   );
 };
 
-// Fungsi untuk mendapatkan preferensi hari user terbaru
 export const getLatestUserDaysPreference = async () => {
   const db = await getDBConnection();
   const result = await db.getFirstAsync(
