@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { callGeminiAPI } from "../api/api";
-import * as FileSystem from "expo-file-system";
-import { useTheme } from "../ThemeContext";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
+import { callGeminiAPI } from "../api/api";
 import { createChatHistoryTable, saveChatHistory } from "../database/UserDB";
 
 export default function ChatScreen() {
