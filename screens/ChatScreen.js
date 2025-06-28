@@ -30,7 +30,6 @@ export default function ChatScreen() {
   const [isAtBottom, setIsAtBottom] = React.useState(true);
 
   useEffect(() => {
-    // Pastikan tabel chat_history sudah ada
     createChatHistoryTable();
   }, []);
 
@@ -94,7 +93,6 @@ export default function ChatScreen() {
           "Maaf, saya tidak dapat memberikan jawaban.";
         setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       }
-      // Simpan ke history jika permintaan jadwal gym
       if (
         prompt.toLowerCase().includes("jadwal gym") ||
         prompt.toLowerCase().includes("gym schedule") ||
