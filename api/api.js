@@ -123,10 +123,10 @@ export const callGeminiAPI = async (prompt) => {
     );
 
     if (isGymScheduleRequest) {
-      // Ambil hasil jadwal dari AI (Gemini)
+
       let csvContent = null;
       let explanation = null;
-      // Cek jika response.data mengandung CSV dan penjelasan
+
       if (
         response.data &&
         response.data.candidates &&
@@ -146,7 +146,7 @@ export const callGeminiAPI = async (prompt) => {
           explanation = aiText;
         }
       }
-      // Jika tidak ada CSV dari AI, fallback ke default
+
       if (!csvContent) {
         csvContent = generateDefaultGymSchedule(
           userData.weight,
