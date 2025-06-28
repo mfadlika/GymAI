@@ -1,4 +1,3 @@
-import React from "react";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 import { LanguageProvider, useLanguage } from "./LanguageContext";
 import {
@@ -79,6 +78,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
 
 function AppContainer() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <NavigationContainer>
@@ -91,12 +91,20 @@ function AppContainer() {
           headerTintColor: isDarkMode ? "#fff" : "#222",
         }}
       >
-        <Tab.Screen name="Chat" component={ChatScreen} />
-        <Tab.Screen name="Riwayat" component={HistoryScreen} />
+        <Tab.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{ title: t("chat") }}
+        />
+        <Tab.Screen
+          name="Riwayat"
+          component={HistoryScreen}
+          options={{ title: t("history") }}
+        />
         <Tab.Screen
           name="Profil"
           component={ProfileStack}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: t("profile") }}
         />
       </Tab.Navigator>
     </NavigationContainer>
