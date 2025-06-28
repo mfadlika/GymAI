@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
+  Alert,
+  Button,
   Image,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Button,
-  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import photo from "../assets/yudha.jpeg";
 import {
   createTable,
-  saveUserData,
   getLatestUserData,
   getLatestUserDaysPreference,
+  saveUserData,
   updateUserDaysPreference,
 } from "../database/UserDB";
-import { useTheme } from "../ThemeContext";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
 
 export default function ProfileScreen() {
   const [name, setName] = useState("");

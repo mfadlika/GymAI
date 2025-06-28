@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  Alert,
   FlatList,
   Modal,
   ScrollView,
-  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-  getDBConnection,
-  updateUserDaysPreference,
-  getLatestUserData,
   getAllChatHistory,
+  getDBConnection,
+  getLatestUserData,
+  updateUserDaysPreference,
 } from "../database/UserDB";
-import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../ThemeContext";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
 
 export default function HistoryScreen() {
   const { isDarkMode } = useTheme();

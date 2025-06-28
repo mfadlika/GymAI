@@ -1,9 +1,8 @@
-import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
 import ProfileScreen from "./ProfileScreen";
 import SettingScreen from "./SettingScreen";
-import { useTheme } from "../ThemeContext";
-import { useLanguage } from "../LanguageContext";
 
 const Stack = createStackNavigator();
 

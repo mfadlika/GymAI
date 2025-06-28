@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { callGeminiAPI } from "../api/api";
-import * as FileSystem from "expo-file-system";
-import { useTheme } from "../ThemeContext";
 import { useLanguage } from "../LanguageContext";
+import { useTheme } from "../ThemeContext";
+import { callGeminiAPI } from "../api/api";
 import { createChatHistoryTable, saveChatHistory } from "../database/UserDB";
 
 export default function ChatScreen() {
@@ -30,7 +30,6 @@ export default function ChatScreen() {
   const [isAtBottom, setIsAtBottom] = React.useState(true);
 
   useEffect(() => {
-    // Pastikan tabel chat_history sudah ada
     createChatHistoryTable();
   }, []);
 
@@ -94,7 +93,6 @@ export default function ChatScreen() {
           "Maaf, saya tidak dapat memberikan jawaban.";
         setMessages((prev) => [...prev, { text: botReply, sender: "bot" }]);
       }
-      // Simpan ke history jika permintaan jadwal gym
       if (
         prompt.toLowerCase().includes("jadwal gym") ||
         prompt.toLowerCase().includes("gym schedule") ||

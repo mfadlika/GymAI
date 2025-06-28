@@ -1,19 +1,18 @@
-import React from "react";
-import { ThemeProvider, useTheme } from "./ThemeContext";
-import { LanguageProvider, useLanguage } from "./LanguageContext";
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
 import {
-  View,
+  Dimensions,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  Dimensions,
+  View,
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { LanguageProvider, useLanguage } from "./LanguageContext";
 import ChatScreen from "./screens/ChatScreen";
 import HistoryScreen from "./screens/HistoryScreen";
 import ProfileStack from "./screens/ProfileStack";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
 const { width } = Dimensions.get("window");
 const Tab = createBottomTabNavigator();
@@ -79,6 +78,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
 
 function AppContainer() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <NavigationContainer>
@@ -91,12 +91,20 @@ function AppContainer() {
           headerTintColor: isDarkMode ? "#fff" : "#222",
         }}
       >
-        <Tab.Screen name="Chat" component={ChatScreen} />
-        <Tab.Screen name="Riwayat" component={HistoryScreen} />
+        <Tab.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{ title: t("chat") }}
+        />
+        <Tab.Screen
+          name="Riwayat"
+          component={HistoryScreen}
+          options={{ title: t("history") }}
+        />
         <Tab.Screen
           name="Profil"
           component={ProfileStack}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: t("profile") }}
         />
       </Tab.Navigator>
     </NavigationContainer>

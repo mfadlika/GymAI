@@ -54,6 +54,8 @@ MobileApp/
 ├── babel.config.js
 ├── index.js           # Index file
 ├── package.json
+├── LanguageContext.js # Language Context
+├── ThemeContext.js    # Theme Context
 └── README.md
 ```
 
